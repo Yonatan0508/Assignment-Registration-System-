@@ -1,8 +1,4 @@
 import OpenAI from "openai";
-
-
-
-// 📦 ייבוא ספריות
 import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
@@ -10,12 +6,15 @@ import fetch from "node-fetch";
 import XLSX from "xlsx";
 import fs from "fs";
 
-dotenv.config();
 const PORT = process.env.PORT || 5001;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 const WHATSAPP_ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
+
 const app = express();
+dotenv.config();
+
 app.use(express.json());
+
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
