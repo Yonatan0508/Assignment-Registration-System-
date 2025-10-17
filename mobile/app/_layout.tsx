@@ -18,14 +18,14 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-
+      {/* ✅ Stack יחיד עם הגדרה גלובלית */}
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="index" />
         <Stack.Screen
           name="register"
           options={{
             title: "Register",
-            headerShown: true,
             headerStyle: { backgroundColor: "#3949AB" },
             headerTintColor: "#fff",
             headerTitleStyle: { fontWeight: "600" }
@@ -34,7 +34,6 @@ export default function RootLayout() {
       </Stack>
 
       <Toast />
-
       <StatusBar style="auto" />
     </ThemeProvider>
   );

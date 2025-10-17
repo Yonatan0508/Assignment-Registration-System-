@@ -1,7 +1,6 @@
 import axios from "axios";
 
-const BASE_URL =
-  "https://registration-server-h4gmcwekhfctaraz.westeurope-01.azurewebsites.net";
+const BASE_URL = process.env.BASE_URL;
 
 export async function registerUser(userData) {
   try {
