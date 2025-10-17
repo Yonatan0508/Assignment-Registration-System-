@@ -19,16 +19,8 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack>
-        {/* מסך הטאבים הראשי */}
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-        {/* מסך מודאל (Popup) */}
-        <Stack.Screen
-          name="modal"
-          options={{ presentation: "modal", title: "Modal" }}
-        />
-
-        {/* מסך ההרשמה */}
         <Stack.Screen
           name="register"
           options={{
@@ -41,10 +33,8 @@ export default function RootLayout() {
         />
       </Stack>
 
-      {/* Toast גלובלי לכל האפליקציה */}
       <Toast />
 
-      {/* Status bar */}
       <StatusBar style="auto" />
     </ThemeProvider>
   );
