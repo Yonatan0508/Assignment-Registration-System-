@@ -9,7 +9,6 @@ import dotenv from "dotenv";
 import fetch from "node-fetch";
 import XLSX from "xlsx";
 import fs from "fs";
-// 🧩 טעינת משתני סביבה
 
 dotenv.config();
 const PORT = process.env.PORT || 5001;
@@ -23,14 +22,17 @@ const client = new OpenAI({
 
 async function generateBotReply(userMessage) {
   const systemPrompt = `
-  אתה עוזר וירטואלי ידידותי של חברת "A.B Deliveries".
-  תפקידך:
-  - לענות בעברית בצורה מנומסת וחיובית.
-  - אם השאלה קשורה למעקב אחרי חבילה — תשאל את המשתמש מה מספר החבילה ותענה בהתאם.
-  - אם מדובר בשירות לקוחות — תהיה אדיב ותשאל איך אפשר לעזור.
-  - אם מדובר בהזמנה חדשה — תעודד את הלקוח להזמין עוד משלוחים.
-  חשוב: אל תשתמש במונחים טכניים, דבר בגובה העיניים.
-  `;
+You are a friendly virtual assistant for the company "A.B Deliveries".
+Your role:
+
+Respond in Hebrew, politely and positively.
+
+If the user asks about package tracking, ask for the tracking number and respond accordingly.
+
+If the user is contacting customer service, be courteous and ask how you can assist.
+
+If the user is interested in placing a new order, encourage them to make more deliveries.
+Important: Avoid using technical terms — speak in a warm, simple, human way.`;
 
   try {
     const completion = await client.chat.completions.create({
@@ -43,8 +45,8 @@ async function generateBotReply(userMessage) {
 
     return completion.choices[0].message.content.trim();
   } catch (error) {
-    console.error("❌ Error generating bot reply:", error);
-    return "מצטער, יש כרגע עומס במערכת. נסה שוב בעוד רגע 🙂";
+    console.error(" Error generating bot reply:", error);
+    return "מצטער, יש כרגע עומס במערכת. נסה שוב בעוד רגע ";
   }
 }
 
@@ -68,16 +70,16 @@ async function sendMessage(to, text) {
     });
 
     const data = await response.json();
-    console.log("📤 Message sent:", data);
+    console.log("Message sent:", data);
   } catch (error) {
-    console.error("❌ Error sending message:", error);
+    console.error(" Error sending message:", error);
   }
 }
 
 app.use(bodyParser.json());
 
 app.get("/webhook", (req, res) => {
-	  console.log("📥 Webhook verification request received:", req.query);
+	  console.log(" Webhook verification request received:", req.query);
   const VERIFY_TOKEN = process.env.VERIFY_TOKEN || "AB_DELIVERIES_TOKEN";
   const mode = req.query["hub.mode"];
   const token = req.query["hub.verify_token"];
@@ -92,7 +94,6 @@ app.get("/webhook", (req, res) => {
   }
 });
 
-// 💬 טיפול בהודעות נכנסות
 app.post("/webhook", async (req, res) => {
   try {
     const entry = req.body.entry?.[0];
@@ -102,7 +103,7 @@ app.post("/webhook", async (req, res) => {
     if (message) {
       const from = message.from;
       const text = message.text?.body || "";
-      console.log(`📩 New message from ${from}: ${text}`);
+      console.log(` New message from ${from}: ${text}`);
   logToExcel("לקוח", from, text);
 
       const botReply = await generateBotReply(text);
@@ -112,13 +113,13 @@ app.post("/webhook", async (req, res) => {
 
     res.sendStatus(200);
   } catch (err) {
-    console.error("❌ Error processing webhook:", err);
+    console.error(" Error processing webhook:", err);
     res.sendStatus(500);
   }
 });
 
 app.get("/", (req, res) => {
-res.send("🚚 A.B Deliveries WhatsApp Bot is Running!  v2");
+res.send(" A.B Deliveries WhatsApp Bot is Running!  v2");
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
