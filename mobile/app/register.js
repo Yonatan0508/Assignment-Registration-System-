@@ -23,7 +23,8 @@ export default function RegisterScreen() {
   const [errors, setErrors] = useState({});
   const [isFormValid, setIsFormValid] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
-
+const [showPassword, setShowPassword] = useState(false);
+const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   useEffect(() => {
     const valid =
       form.fullName.trim() &&
@@ -78,28 +79,46 @@ export default function RegisterScreen() {
           onChangeText={(text) => setForm({ ...form, email: text })}
         />
       </View>
+<View style={styles.inputContainer}>
+  <MaterialIcons name="lock-outline" size={20} color="#888" />
+  <TextInput
+    style={[styles.input, { flex: 1 }]}
+    placeholder="Password"
+    secureTextEntry={!showPassword}
+    value={form.password}
+    onChangeText={(text) => setForm({ ...form, password: text })}
+  />
+  {form.password.length > 0 && (<TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+    <MaterialIcons
+      name={!showPassword ? "visibility" : "visibility-off"}
+      size={20}
+      color="#888"
+    />
+  </TouchableOpacity>)
+  }
+  
+</View>
 
-      <View style={styles.inputContainer}>
-        <MaterialIcons name="lock-outline" size={20} color="#888" />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry
-          value={form.password}
-          onChangeText={(text) => setForm({ ...form, password: text })}
-        />
-      </View>
-
-      <View style={styles.inputContainer}>
-        <MaterialIcons name="lock-outline" size={20} color="#888" />
-        <TextInput
-          style={styles.input}
-          placeholder="Confirm Password"
-          secureTextEntry
-          value={form.confirmPassword}
-          onChangeText={(text) => setForm({ ...form, confirmPassword: text })}
-        />
-      </View>
+<View style={styles.inputContainer}>
+  <MaterialIcons name="lock-outline" size={20} color="#888" />
+  <TextInput
+    style={[styles.input, { flex: 1 }]}
+    placeholder="Confirm Password"
+    secureTextEntry={!showConfirmPassword}
+    value={form.confirmPassword}
+    onChangeText={(text) =>
+      setForm({ ...form, confirmPassword: text })
+    }
+  />
+   {form.password.length > 0 && ( <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+    <MaterialIcons
+      name={!showConfirmPassword ? "visibility" : "visibility-off"}
+      size={20}
+      color="#888"
+    />
+  </TouchableOpacity>)
+}
+</View>
 
       <TouchableOpacity
         style={[
