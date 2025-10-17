@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Toast from "react-native-toast-message";
+
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Image
+  Alert
 } from "react-native";
 import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
+import { registerUser } from "../authApi";
 
 export default function RegisterScreen() {
   const [form, setForm] = useState({
@@ -17,38 +20,39 @@ export default function RegisterScreen() {
     confirmPassword: ""
   });
 
-  const [errors, setErrors] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-    confirmPassword: ""
-  });
+  const [errors, setErrors] = useState({});
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
 
-  const validateForm = () => {
-    let newErrors = {};
+  useEffect(() => {
+    const valid =
+      form.fullName.trim() &&
+      form.email.includes("@") &&
+      form.password.length >= 6 &&
+      form.password === form.confirmPassword;
+    setIsFormValid(valid);
+  }, [form]);
 
-    if (!form.fullName.trim()) {
-      newErrors.fullName = "Full name is required";
+  async function handleRegister(form) {
+    try {
+      const userPayload = {
+        fullName: form.fullName,
+        email: form.email,
+        password: form.password
+      };
+
+      const result = await registerUser(userPayload);
+      Toast.show({
+        type: "success",
+        text1: "Registration Success",
+        text2: result.gpt_response.response_from_gpt_server.message,
+        position: "bottom"
+      });
+      console.log("Registration success:", result);
+    } catch (err) {
+      Alert.alert("Error", err.response?.data?.detail || err.message);
     }
-
-    if (!form.email.includes("@")) {
-      newErrors.email = "Please enter a valid email address";
-    }
-
-    if (form.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-
-    if (form.password !== form.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  }
 
   return (
     <View style={styles.container}>
@@ -57,20 +61,12 @@ export default function RegisterScreen() {
       <View style={styles.inputContainer}>
         <MaterialIcons name="person-outline" size={20} color="#888" />
         <TextInput
-          style={[
-            styles.input,
-            errors.fullName && styles.inputError // משנה את המסגרת כשיש שגיאה
-          ]}
+          style={styles.input}
           placeholder="Full Name"
           value={form.fullName}
-          onChangeText={text => setForm({ ...form, fullName: text })}
+          onChangeText={(text) => setForm({ ...form, fullName: text })}
         />
       </View>
-      {errors.fullName
-        ? <Text style={styles.errorText}>
-            {errors.fullName}
-          </Text>
-        : null}
 
       <View style={styles.inputContainer}>
         <MaterialIcons name="email" size={20} color="#888" />
@@ -79,84 +75,67 @@ export default function RegisterScreen() {
           placeholder="Email"
           keyboardType="email-address"
           value={form.email}
-          onChangeText={text => setForm({ ...form, email: text })}
+          onChangeText={(text) => setForm({ ...form, email: text })}
         />
       </View>
-      {errors.email
-        ? <Text style={styles.errorText}>
-            {errors.email}
-          </Text>
-        : null}
 
       <View style={styles.inputContainer}>
         <MaterialIcons name="lock-outline" size={20} color="#888" />
         <TextInput
           style={styles.input}
           placeholder="Password"
-          secureTextEntry={!showPassword}
+          secureTextEntry
           value={form.password}
-          onChangeText={text => setForm({ ...form, password: text })}
+          onChangeText={(text) => setForm({ ...form, password: text })}
         />
-        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-          <MaterialIcons
-            name={showPassword ? "visibility-off" : "visibility"}
-            size={20}
-            color="#888"
-          />
-        </TouchableOpacity>
       </View>
-      {errors.password
-        ? <Text style={styles.errorText}>
-            {errors.password}
-          </Text>
-        : null}
 
       <View style={styles.inputContainer}>
         <MaterialIcons name="lock-outline" size={20} color="#888" />
         <TextInput
           style={styles.input}
           placeholder="Confirm Password"
-          secureTextEntry={!showConfirmPassword}
+          secureTextEntry
           value={form.confirmPassword}
-          onChangeText={text => setForm({ ...form, confirmPassword: text })}
+          onChangeText={(text) => setForm({ ...form, confirmPassword: text })}
         />
-        <TouchableOpacity
-          onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-        >
-          <MaterialIcons
-            name={showConfirmPassword ? "visibility-off" : "visibility"}
-            size={20}
-            color="#888"
-          />
-        </TouchableOpacity>
       </View>
-      {errors.confirmPassword
-        ? <Text style={styles.errorText}>
-            {errors.confirmPassword}
-          </Text>
-        : null}
 
       <TouchableOpacity
-        style={styles.registerButton}
-        onPress={() => validateForm()}
+        style={[
+          styles.registerButton,
+          {
+            backgroundColor: isPressed
+              ? "#27368F"
+              : isFormValid
+              ? "#3949AB"
+              : "#b8b8e6"
+          }
+        ]}
+        disabled={!isFormValid}
+        onPressIn={() => setIsPressed(true)}
+        onPressOut={() => setIsPressed(false)}
+        onPress={() => handleRegister(form)}
       >
         <Text style={styles.registerText}>Register</Text>
       </TouchableOpacity>
-
       <View style={styles.separatorContainer}>
         <View style={styles.separatorLine} />
         <Text style={styles.separatorText}>OR</Text>
         <View style={styles.separatorLine} />
       </View>
-
-      {/* כפתורי Google / Facebook */}
       <View style={styles.socialContainer}>
-        <TouchableOpacity style={styles.socialButton}>
-          <FontAwesome name="google" size={18} color="#db4a39" />
-          <Text style={styles.socialText}>Google</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.socialButton}>
+    <TouchableOpacity
+      style={[
+        styles.socialButton,
+        { opacity: isFormValid ? 1 : 0.1 }
+      ]}
+    >
+      <FontAwesome name="google" size={18} color="#db4a39" />
+      <Text style={styles.socialText}>Google</Text>
+    </TouchableOpacity>
+        <TouchableOpacity style={[styles.socialButton,
+        { opacity: isFormValid ? 1 : 0.1 }]}>
           <FontAwesome name="facebook" size={18} color="#4267B2" />
           <Text style={styles.socialText}>Facebook</Text>
         </TouchableOpacity>
@@ -196,27 +175,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333"
   },
-  inputError: {
-    borderColor: "#ff5b5b"
-  },
-  errorText: {
-    color: "#ff5b5b",
-    fontSize: 13,
-    marginBottom: 5,
-    marginLeft: 4
-  },
   registerButton: {
-    backgroundColor: "#b8b8e6",
     borderRadius: 25,
     paddingVertical: 14,
     width: "100%",
     alignItems: "center",
     marginTop: 5
-  },
-  registerText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600"
   },
   separatorContainer: {
     flexDirection: "row",
@@ -253,5 +217,10 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     color: "#333",
     fontSize: 14
+  },
+  registerText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600"
   }
 });

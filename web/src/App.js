@@ -10,6 +10,8 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import Button from "@mui/material/Button";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { registerUser } from "./shared/authApi";
+
 import React, { useState } from "react";
 function App() {
   const [showPassword, setShowPassword] = useState(false);
@@ -26,7 +28,21 @@ function App() {
     password: "",
     confirmPassword: ""
   });
+async function handleRegister(form) {
+  try {
+    const userPayload = {
+      fullName: form.fullName,
+      email: form.email,
+      password: form.password,
+    };
 
+    const result = await registerUser(userPayload);
+    console.log("Registration success:", result);
+    alert(` ${result.gpt_response.response_from_gpt_server.message}`);
+  } catch (err) {
+    alert(" Error: " + (err.response?.data?.detail || err.message));
+  }
+}
   const validateForm = () => {
     let newErrors = {};
 
@@ -165,6 +181,7 @@ function App() {
             onClick={() => {
               if (validateForm()) {
                 alert("Form submitted successfully!");
+				handleRegister(form);
               }
             }}
           >

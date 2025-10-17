@@ -6,7 +6,7 @@ import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Link } from "expo-router";
-import RegisterScreen from "../../screens/RegisterScreen";
+import RegisterScreen from "../register";
 
 export default function HomeScreen() {
   return <RegisterScreen />;
