@@ -15,7 +15,7 @@ mongo_uri = os.getenv("MONGO_URI")
 client = MongoClient(mongo_uri)
 db = client[os.getenv("DB_NAME")]
 users_collection = db["users"]
-GPT_SERVER_URL = "https://gpt-server-node-agc7h0gbexc0f3b4.westeurope-01.azurewebsites.net/generate-text"
+GPT_SERVER_URL = os.getenv("GPT_SERVER_URL")
 
 app.add_middleware(
     CORSMiddleware,
