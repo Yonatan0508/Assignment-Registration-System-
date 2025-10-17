@@ -110,7 +110,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
       setForm({ ...form, confirmPassword: text })
     }
   />
-   {form.password.length > 0 && ( <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+   {form.confirmPassword.length > 0 && ( <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
     <MaterialIcons
       name={!showConfirmPassword ? "visibility" : "visibility-off"}
       size={20}
